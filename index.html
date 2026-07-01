@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Material Request Form</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --navy:#1E2A4A; --navy-light:#2D3F6B; --teal:#0D9488; --teal-light:#CCFBF1; --green:#10B981; --bg:#F0F4F8; --surface:#FFFFFF; --border:#D1DAE8; --text:#1E2A4A; --muted:#6B7A99; --danger:#EF4444; }
+  body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+  header { background:var(--navy); padding:0 32px; height:60px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 2px 8px rgba(0,0,0,.25); }
+  .header-brand { display:flex; align-items:center; gap:10px; color:#fff; font-weight:700; font-size:16px; }
+  .header-badge { background:var(--teal); color:#fff; font-size:11px; font-weight:600; padding:3px 10px; border-radius:20px; }
+  .layout { max-width:1200px; margin:0 auto; padding:28px 24px; }
+  .card { background:var(--surface); border-radius:14px; padding:28px; box-shadow:0 1px 4px rgba(30,42,74,.06),0 4px 16px rgba(30,42,74,.04); border:1px solid var(--border); margin-bottom:24px; }
+  .card-title { font-size:13px; font-weight:700; letter-spacing:.8px; text-transform:uppercase; color:var(--muted); margin-bottom:20px; display:flex; align-items:center; gap:8px; }
+  .card-title::after { content:''; flex:1; height:1px; background:var(--border); }
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  .field { display:flex; flex-direction:column; gap:6px; }
+  .field.span2 { grid-column:span 2; }
+  label { font-size:12px; font-weight:600; color:var(--muted); letter-spacing:.4px; text-transform:uppercase; }
+  input[type=text],input[type=number],input[type=date] { height:44px; border:1.5px solid var(--border); border-radius:9px; padding:0 14px; font-family:inherit; font-size:14px; color:var(--text); background:var(--surface); outline:none; width:100%; transition:border-color .15s,box-shadow .15s; }
+  input:focus { border-color:var(--teal); box-shadow:0 0 0 3px rgba(13,148,136,.12); }
+  input::placeholder { color:#A5B4CC; }
+  .photo-zone { border:2px dashed var(--border); border-radius:12px; padding:24px 16px; text-align:center; cursor:pointer; transition:border-color .2s,background .2s; position:relative; background:var(--bg); }
+  .photo-zone:hover,.photo-zone.dragover { border-color:var(--teal); background:var(--teal-light); }
+  .photo-zone input[type=file] { display:none; }
+  .photo-zone-icon { font-size:32px; margin-bottom:8px; }
+  .photo-zone-label { font-size:13px; font-weight:600; color:var(--navy-light); margin-bottom:4px; }
+  .photo-zone-hint { font-size:11px; color:var(--muted); }
+  .photo-preview-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(80px,1fr)); gap:10px; margin-top:14px; }
+  .photo-thumb { position:relative; border-radius:8px; overflow:hidden; aspect-ratio:1; background:var(--border); }
+  .photo-thumb img { width:100%; height:100%; object-fit:cover; }
+  .photo-thumb .remove-btn { position:absolute; top:4px; right:4px; width:20px; height:20px; background:rgba(0,0,0,.6); color:#fff; border-radius:50%; border:none; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .date-wrap { position:relative; }
+  .date-wrap input[type=date] { padding-right:40px; cursor:pointer; }
+  .date-wrap::after { content:'📅'; position:absolute; right:13px; top:50%; transform:translateY(-50%); font-size:15px; pointer-events:none; }
+  .submit-wrap { margin-top:24px; display:flex; gap:12px; }
+  .btn-primary { flex:1; height:48px; background:var(--navy); color:#fff; border:none; border-radius:10px; font-family:inherit; font-size:14px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:background .15s; }
+  .btn-primary:hover { background:var(--navy-light); }
+  .btn-outline { height:48px; padding:0 20px; background:transparent; color:var(--muted); border:1.5px solid var(--border); border-radius:10px; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer; transition:all .15s; }
+  .btn-outline:hover { border-color:var(--navy); color:var(--navy); }
+  .btn-excel { height:40px; padding:0 18px; background:#1D6F42; color:#fff; border:none; border-radius:9px; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:7px; transition:background .15s; }
+  .btn-excel:hover { background:#155c36; }
+  .btn-excel:disabled { background:#888; cursor:not-allowed; }
+  .table-toolbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .table-toolbar-title { font-size:13px; font-weight:700; letter-spacing:.8px; text-transform:uppercase; color:var(--muted); display:flex; align-items:center; gap:8px; }
+  .entry-table { width:100%; border-collapse:collapse; font-size:13px; }
+  .entry-table th { text-align:left; padding:10px 12px; font-size:11px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; color:var(--muted); border-bottom:1px solid var(--border); }
+  .entry-table td { padding:12px; border-bottom:1px solid #EEF2F7; vertical-align:middle; }
+  .entry-table tr:last-child td { border-bottom:none; }
+  .entry-table tr:hover td { background:#FAFBFD; }
+  .td-img { width:40px; height:40px; border-radius:8px; object-fit:cover; border:1px solid var(--border); }
+  .no-img { width:40px; height:40px; border-radius:8px; background:var(--bg); display:flex; align-items:center; justify-content:center; font-size:16px; border:1px solid var(--border); }
+  .check-toggle { width:28px; height:28px; border-radius:8px; border:2px solid var(--border); background:var(--surface); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .2s; margin:0 auto; }
+  .check-toggle:hover { border-color:var(--teal); background:var(--teal-light); }
+  .check-toggle.done { background:var(--green); border-color:var(--green); }
+  .check-toggle svg { display:none; }
+  .check-toggle.done svg { display:block; }
+  .tag { display:inline-flex; align-items:center; padding:3px 10px; border-radius:99px; font-size:11px; font-weight:700; }
+  .tag-blue { background:#DBEAFE; color:#1E40AF; }
+  .btn-del { background:none; border:none; cursor:pointer; color:var(--muted); font-size:16px; padding:4px 8px; border-radius:6px; transition:all .15s; }
+  .btn-del:hover { background:#FEE2E2; color:var(--danger); }
+  .empty-state { text-align:center; padding:40px 20px; color:var(--muted); }
+  .empty-state .es-icon { font-size:36px; margin-bottom:10px; }
+  .empty-state p { font-size:13px; }
+  .toast { position:fixed; bottom:32px; left:50%; transform:translateX(-50%) translateY(80px); background:var(--navy); color:#fff; padding:14px 24px; border-radius:12px; font-size:14px; font-weight:500; box-shadow:0 8px 24px rgba(30,42,74,.3); transition:transform .35s ease; z-index:1000; }
+  .toast.show { transform:translateX(-50%) translateY(0); }
+  @media(max-width:768px){.form-grid{grid-template-columns:1fr}.field.span2{grid-column:span 1}.table-toolbar{flex-direction:column;gap:12px;align-items:flex-start}}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-brand">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6EE7E7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    Material Request System
+  </div>
+  <span class="header-badge">PRODUKSI</span>
+</header>
+<div class="layout">
+  <div class="card">
+    <div class="card-title">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Data Pengajuan Material
+    </div>
+    <div class="form-grid">
+      <div class="field"><label>Nama Material</label><input type="text" id="namaMaterial" placeholder="Contoh: Besi Hollow 40x40"/></div>
+      <div class="field"><label>Buyer / Pelanggan</label><input type="text" id="buyer" placeholder="Nama buyer atau perusahaan"/></div>
+      <div class="field"><label>Qty</label><input type="number" id="qty" placeholder="0" min="0" step="any"/></div>
+      <div class="field"><label>RPM</label><input type="number" id="rpm" placeholder="0" min="0" step="any"/></div>
+      <div class="field"><label>FDIS</label><input type="text" id="fdis" placeholder="Masukkan nilai FDIS"/></div>
+      <div class="field"><label>Tanggal Pengajuan</label><div class="date-wrap"><input type="date" id="tanggal"/></div></div>
+      <div class="field span2">
+        <label>Kodifikasi (Foto)</label>
+        <div class="photo-zone" id="photoZone" onclick="document.getElementById('photoInput').click()">
+          <input type="file" id="photoInput" accept="image/*" multiple style="display:none"/>
+          <div class="photo-zone-icon">🖼️</div>
+          <div class="photo-zone-label">Klik untuk pilih foto kodifikasi</div>
+          <div class="photo-zone-hint">JPG, PNG, WEBP · Maksimal 10 foto</div>
+        </div>
+        <div class="photo-preview-grid" id="photoPreview"></div>
+      </div>
+    </div>
+    <div class="submit-wrap">
+      <button class="btn-outline" onclick="resetForm()">Reset</button>
+      <button class="btn-primary" onclick="submitEntry()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Simpan Pengajuan
+      </button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="table-toolbar">
+      <div class="table-toolbar-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+        Riwayat Pengajuan
+      </div>
+      <button class="btn-excel" id="btnExcel" onclick="downloadExcel()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download Excel
+      </button>
+    </div>
+    <div id="tableWrap">
+      <div class="empty-state"><div class="es-icon">📋</div><p>Belum ada data pengajuan.<br>Isi form di atas untuk mulai menambahkan.</p></div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"><span id="toastMsg"></span></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+<script>
+// ── PHOTO UPLOAD ─────────────────────────────────
+let photos = [];
+const photoZone = document.getElementById('photoZone');
+const photoInput = document.getElementById('photoInput');
+photoInput.addEventListener('change', e => handleFiles(e.target.files));
+photoZone.addEventListener('dragover', e => { e.preventDefault(); photoZone.classList.add('dragover'); });
+photoZone.addEventListener('dragleave', () => photoZone.classList.remove('dragover'));
+photoZone.addEventListener('drop', e => { e.preventDefault(); photoZone.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
+// Mobile: prevent double-fire from onclick+change
+photoInput.addEventListener('click', e => e.stopPropagation());
+
+function handleFiles(files) {
+  Array.from(files).forEach(file => {
+    if (!file.type.startsWith('image/') || photos.length >= 10) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const dataURL = ev.target.result;
+      // Always convert to PNG via canvas for Excel compatibility, resized to a sane max
+      const img = new Image();
+      img.onload = () => {
+        const MAX_DIM = 1200; // cap longest side to avoid blank/huge canvas issues
+        let w = img.naturalWidth, h = img.naturalHeight;
+        if (w > MAX_DIM || h > MAX_DIM) {
+          if (w >= h) { h = Math.round(h * (MAX_DIM / w)); w = MAX_DIM; }
+          else { w = Math.round(w * (MAX_DIM / h)); h = MAX_DIM; }
+        }
+        const cv = document.createElement('canvas');
+        cv.width = w; cv.height = h;
+        const ctx = cv.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        const pngURL = cv.toDataURL('image/png');
+        const base64 = pngURL.split(',')[1];
+        photos.push({ url: pngURL, name: file.name, base64 });
+        renderPhotoPreview();
+      };
+      img.onerror = () => { showToast('❌ Gagal memuat foto: ' + file.name); };
+      img.src = dataURL;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+function renderPhotoPreview() {
+  document.getElementById('photoPreview').innerHTML = photos.map((p,i) => `
+    <div class="photo-thumb">
+      <img src="${p.url}" alt="${p.name}"/>
+      <button class="remove-btn" onclick="removePhoto(${i})">×</button>
+    </div>`).join('');
+}
+function removePhoto(i) { photos.splice(i,1); renderPhotoPreview(); }
+
+// ── ENTRIES ──────────────────────────────────────
+let entries = [];
+function submitEntry() {
+  const nama=document.getElementById('namaMaterial').value.trim();
+  const buyer=document.getElementById('buyer').value.trim();
+  const qty=document.getElementById('qty').value;
+  const rpm=document.getElementById('rpm').value;
+  const fdis=document.getElementById('fdis').value.trim();
+  const tanggal=document.getElementById('tanggal').value;
+  if (!nama||!buyer||!tanggal){showToast('⚠️ Nama material, buyer, dan tanggal wajib diisi!');return;}
+  entries.unshift({id:Date.now(),nama,buyer,qty:qty||'-',rpm:rpm||'-',fdis:fdis||'-',tanggal,photos:[...photos],selesai:false});
+  renderTable(); resetForm(); showToast('✅ Data berhasil disimpan!');
+}
+function toggleSelesai(id){const e=entries.find(e=>e.id===id);if(e){e.selesai=!e.selesai;renderTable();}}
+function deleteEntry(id){entries=entries.filter(e=>e.id!==id);renderTable();showToast('🗑️ Data dihapus.');}
+function renderTable(){
+  const wrap=document.getElementById('tableWrap');
+  if(!entries.length){wrap.innerHTML=`<div class="empty-state"><div class="es-icon">📋</div><p>Belum ada data pengajuan.<br>Isi form di atas untuk mulai menambahkan.</p></div>`;return;}
+  wrap.innerHTML=`<div style="overflow-x:auto"><table class="entry-table"><thead><tr>
+    <th>Foto</th><th>Nama Material</th><th>Buyer</th><th>Qty</th><th>RPM</th><th>FDIS</th><th>Tanggal</th><th style="text-align:center">Selesai</th><th></th>
+  </tr></thead><tbody>${entries.map(e=>`
+    <tr style="${e.selesai?'opacity:.6':''}">
+      <td>${e.photos.length?`<img class="td-img" src="${e.photos[0].url}"/>`:`<div class="no-img">📷</div>`}</td>
+      <td><strong style="${e.selesai?'text-decoration:line-through':''}">${e.nama}</strong></td>
+      <td>${e.buyer}</td><td><span class="tag tag-blue">${e.qty}</span></td>
+      <td>${e.rpm}</td><td>${e.fdis}</td><td>${formatDate(e.tanggal)}</td>
+      <td style="text-align:center">
+        <div class="check-toggle ${e.selesai?'done':''}" onclick="toggleSelesai(${e.id})">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+      </td>
+      <td><button class="btn-del" onclick="deleteEntry(${e.id})">🗑️</button></td>
+    </tr>`).join('')}</tbody></table></div>`;
+}
+
+// ── DOWNLOAD EXCEL (ExcelJS) ───────────────────────
+async function downloadExcel() {
+  if (!entries.length) { showToast('⚠️ Tidak ada data untuk diunduh.'); return; }
+  const btn = document.getElementById('btnExcel');
+  btn.disabled = true; btn.innerHTML = '⏳ Memproses...';
+  showToast('⏳ Membuat Excel dengan foto...');
+
+  try {
+    const workbook = new ExcelJS.Workbook();
+    workbook.creator = 'Material Request System';
+
+    for (let i = 0; i < entries.length; i++) {
+      const e = entries[i];
+      const sheetName = `${i+1}_${e.nama}`.substring(0,31).replace(/[\\/\?\*\[\]:&<>"]/g,'_');
+      const ws = workbook.addWorksheet(sheetName);
+
+      // Column widths (in chars)
+      ws.columns = [
+        { key:'no',    width: 5  },
+        { key:'nama',  width: 28 },
+        { key:'buyer', width: 22 },
+        { key:'qty',   width: 10 },
+        { key:'rpm',   width: 10 },
+        { key:'fdis',  width: 14 },
+        { key:'tgl',   width: 22 },
+        { key:'stat',  width: 16 },
+        { key:'foto',  width: 26 },
+      ];
+
+      // Header row
+      const hdrRow = ws.addRow(['No','Nama Material','Buyer','Qty','RPM','FDIS','Tanggal Pengajuan','Status','Foto Kodefikasi']);
+      hdrRow.height = 22;
+      hdrRow.eachCell(cell => {
+        cell.font = { name:'Arial', size:10, bold:true, color:{argb:'FFFFFFFF'} };
+        cell.fill = { type:'pattern', pattern:'solid', fgColor:{argb:'FF1E2A4A'} };
+        cell.alignment = { horizontal:'center', vertical:'middle' };
+      });
+
+      // Data row
+      const dataRow = ws.addRow([
+        i+1, e.nama, e.buyer,
+        e.qty==='-'?'':e.qty,
+        e.rpm==='-'?'':e.rpm,
+        e.fdis==='-'?'':e.fdis,
+        formatDate(e.tanggal),
+        e.selesai?'Selesai':'Belum Selesai',
+        ''
+      ]);
+      dataRow.height = 130; // tall enough to fit the photo
+      dataRow.eachCell(cell => {
+        cell.font = { name:'Arial', size:10 };
+        cell.alignment = { vertical:'middle' };
+      });
+      if (e.selesai) {
+        dataRow.getCell(8).font = { name:'Arial', size:10, bold:true, color:{argb:'FF065F46'} };
+        dataRow.getCell(8).fill = { type:'pattern', pattern:'solid', fgColor:{argb:'FFD1FAE5'} };
+      }
+
+      // Embed photo(s) inside the "Foto Kodefikasi" column (column 9, index 8)
+      if (e.photos.length > 0) {
+        const CM_TO_PX = 96 / 2.54;
+        const IW = Math.round(4.78 * CM_TO_PX);
+        const IH = Math.round(4.62 * CM_TO_PX);
+        const PAD = 4; // small padding inside the cell
+
+        for (let pi = 0; pi < e.photos.length; pi++) {
+          const ph = e.photos[pi];
+          const imageId = workbook.addImage({
+            base64: ph.base64,
+            extension: 'png',
+          });
+          // Anchor inside column index 8 (0-based) = the "foto" column, row index 1 (0-based) = data row
+          ws.addImage(imageId, {
+            tl: { nativeCol: 8, nativeColOff: PAD + pi * (IW + PAD), nativeRow: 1, nativeRowOff: PAD },
+            ext: { width: IW, height: IH },
+            editAs: 'oneCell',
+          });
+        }
+      }
+    }
+
+    // Write to buffer and download
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const today = new Date();
+    a.href = url;
+    a.download = `Material_Request_${today.getFullYear()}${String(today.getMonth()+1).padStart(2,'0')}${String(today.getDate()).padStart(2,'0')}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('📥 Excel + foto berhasil diunduh!');
+  } catch(err) {
+    console.error(err);
+    showToast('❌ Error: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download Excel`;
+  }
+}
+
+// ── UTILS ─────────────────────────────────────────
+function formatDate(d) {
+  if (!d) return '-';
+  const [y,m,day] = d.split('-');
+  const months=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  return `${parseInt(day)} ${months[parseInt(m)-1]} ${y}`;
+}
+function resetForm() {
+  ['namaMaterial','buyer','qty','rpm','fdis'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('tanggal').valueAsDate = new Date();
+  photos=[]; renderPhotoPreview(); document.getElementById('photoInput').value='';
+}
+let toastTimer;
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3500);
+}
+document.getElementById('tanggal').valueAsDate = new Date();
+</script>
+</body>
+</html>
